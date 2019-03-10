@@ -16,16 +16,37 @@ var evHook = require('./hooks/ev-hook.js');
 
 module.exports = h;
 
+/**
+ * 创建虚拟dom节点
+ * @param tagName
+ * @param properties
+ * @param children
+ * @returns {VirtualNode}
+ */
 function h(tagName, properties, children) {
     var childNodes = [];
     var tag, props, key, namespace;
 
+    // 兼容 h(tagName, children) 的调用方式
     if (!children && isChildren(properties)) {
         children = properties;
         props = {};
     }
 
+    // 初始化 props
     props = props || properties || {};
+
+
+    // 把 tag 解析出来
+    // props 这个参数，如果说我们没在 h 函数中输入预设 props
+
+    // 1.
+    // h 函数中只是单纯的传入 h('span#again')
+    // 这里的 parseTag 函数就会输入 (span#again, {})
+    // 在完成解析后，tag 变量中保存的会是 span
+    // 又因为 props 的对象引用地址被传入了 parseTag 中
+    // parseTag 中的改变会直接反映在 props 这个对象中
+    // 这时候 props 由一个空对象，进而变成了 { id : 'again' } 这个对象
     tag = parseTag(tagName, props);
 
     // support keys
@@ -111,11 +132,28 @@ function transformProperties(props) {
     }
 }
 
+/**
+ * 检验是否是虚拟 dom 节点
+ * @param x
+ * @returns {*}
+ */
+
 function isChild(x) {
+
+    // isVNode(x) => 直接就已经是一个虚拟dom节点
+    // isVText(x) => 直接是一个虚拟的文本节点
     return isVNode(x) || isVText(x) || isWidget(x) || isVThunk(x);
 }
 
+/**
+ * 校验是否是 h() 中的 children 参数
+ * @param x
+ * @returns {boolean|*}
+ */
 function isChildren(x) {
+    // x === 'string' => 这个节点就是文本的节点
+    // isArray(x) => 一个子节点数组
+    // isChild(x) => 一个节点
     return typeof x === 'string' || isArray(x) || isChild(x);
 }
 

@@ -7,6 +7,12 @@ var notClassId = /^\.|#/;
 
 module.exports = parseTag;
 
+/**
+ * 解析出来 tagname
+ * @param tag
+ * @param props
+ * @returns {string}
+ */
 function parseTag(tag, props) {
     if (!tag) {
         return 'DIV';

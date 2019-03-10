@@ -47,6 +47,7 @@
   },
   "license": "MIT",
   "scripts": {
+    "amnhh-test" : "node ./test/amnhh/index.js | tap-spec",
     "test": "node ./test/index.js | tap-spec",
     "dot": "node ./test/index.js | tap-dot",
     "start": "node ./index.js",
