@@ -10,7 +10,10 @@ var handleThunk = require("../vnode/handle-thunk.js")
 module.exports = createElement
 
 function createElement(vnode, opts) {
+    // 确定 document
+    // opts 里配置了 document 则走 opts 里的配置，没有就使用 document
     var doc = opts ? opts.document || document : document
+    // opts 里的 warn 取出来
     var warn = opts ? opts.warn : null
 
     vnode = handleThunk(vnode).a

@@ -17,6 +17,7 @@ function EvHook(value) {
 }
 
 EvHook.prototype.hook = function (node, propertyName) {
+    // 为 node 注册一个 evStore 专属的 hash 属性
     var es = EvStore(node);
     var propName = propertyName.substr(3);
 
