@@ -47,10 +47,26 @@ function h(tagName, properties, children) {
     // 又因为 props 的对象引用地址被传入了 parseTag 中
     // parseTag 中的改变会直接反映在 props 这个对象中
     // 这时候 props 由一个空对象，进而变成了 { id : 'again' } 这个对象
+
+    // 2.
+    // 如果说 h 函数中传入两个相冲的，例如：h('span#again', { id : 'amnhh' })
+    // 会以 props 里的为主
+    // 只要知道这里是解析出 tag，填充 props 其实就可以了...
     tag = parseTag(tagName, props);
+
+
+    // 支持 key， namespace 这两个 vnode 函数的特有属性
+
+    // This `key` is not a normal DOM property but is a virtual-dom optimization hint
+    // 这个 key 属性并不是一个常规的 dom 属性，但是却是一个虚拟 dom 的检索索引
+
+    // namespace 也不是一个常规的 dom 属性，但是会使 vdom 创建一个带有 namespace 的 vnode
 
     // support keys
     if (props.hasOwnProperty('key')) {
+        // 给 key 赋值，并且将 props 对象中的 key 置空
+        // 因为我们设置 key 的本意，并不是为 dom 元素设置一个常规属性 key
+        // 而是为了给 dom 元素增加索引，所以 key 属性并不应该出现在 props 这个对象中
         key = props.key;
         props.key = undefined;
     }
@@ -61,6 +77,7 @@ function h(tagName, properties, children) {
         props.namespace = undefined;
     }
 
+    // 为了兼容与修复的，暂时不看
     // fix cursor bug
     if (tag === 'INPUT' &&
         !namespace &&
@@ -81,30 +98,43 @@ function h(tagName, properties, children) {
         props.value = softSetHook(props.value);
     }
 
+    // 主要用来处理 ev- 属性
+    // 也就是事件绑定来着
     transformProperties(props);
 
+    // 处理第三个参数 children
+    // 修改会直接反应到 childNodes 这个数组中
+    // 能 push 进来的，一定是 Vxxxx
     if (children !== undefined && children !== null) {
         addChild(children, childNodes, tag, props);
     }
 
-
+    // 所以 h 函数只是一个 VNode 的语法糖咯。。。
+    // 帮着你调用了一下 VNode 构造函数
     return new VNode(tag, props, childNodes, key, namespace);
 }
 
 function addChild(c, childNodes, tag, props) {
+    // 会直接改变 childNodes 这个参数所包含的数据
+    // 文本与数字直接push VText 进去，因为展示他们就只需要一个 VText
     if (typeof c === 'string') {
         childNodes.push(new VText(c));
     } else if (typeof c === 'number') {
         childNodes.push(new VText(String(c)));
+        // 如果说已经是一个 isVNode(x) || isVText(x) || isWidget(x) || isVThunk(x) 的话
+        // 则直接 push 到 childNodes 中
+        // 因为本身就可以解析了
     } else if (isChild(c)) {
         childNodes.push(c);
     } else if (isArray(c)) {
+        // 如果 child 还是一个数组的话，则继续调用 addChild
         for (var i = 0; i < c.length; i++) {
             addChild(c[i], childNodes, tag, props);
         }
     } else if (c === null || c === undefined) {
         return;
     } else {
+        // 所有正常的逻辑语句都进不去，那就一定是不正常的了，就抛出一个内部封装的 Error 对象
         throw UnexpectedVirtualElement({
             foreignObject: c,
             parentVnode: {
@@ -115,15 +145,23 @@ function addChild(c, childNodes, tag, props) {
     }
 }
 
+/**
+ * 转换 props
+ * @param props
+ */
+
 function transformProperties(props) {
+    // for in + hasOwnProperty, 只检测自有属性
     for (var propName in props) {
         if (props.hasOwnProperty(propName)) {
             var value = props[propName];
 
+            // 如果是 hook，则啥都不做
             if (isHook(value)) {
                 continue;
             }
 
+            // 如果是 ev- 开头的属性，则通过 evHook 注册
             if (propName.substr(0, 3) === 'ev-') {
                 // add ev-foo support
                 props[propName] = evHook(value);
@@ -157,6 +195,13 @@ function isChildren(x) {
     return typeof x === 'string' || isArray(x) || isChild(x);
 }
 
+/**
+ * 一个内部的错误类型
+ * 对 error 的 type 以及 message 做了封装
+ * @param data
+ * @returns {Error}
+ * @constructor
+ */
 function UnexpectedVirtualElement(data) {
     var err = new Error();
 

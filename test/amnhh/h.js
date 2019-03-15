@@ -13,5 +13,11 @@ test('test h method with span#again', function (t) {
 })
 
 test('test h method with ("span#again", { id : "amnhh" })', function (t) {
-
+    const ospan = h(
+        'span#again',
+        {
+            id : 'amnhh'
+        }
+    )
+    console.log(ospan)
 })

@@ -20,6 +20,7 @@ function parseTag(tag, props) {
 
     var noId = !(props.hasOwnProperty('id'));
 
+    // 解析 tag 这个参数，#again 这种该拆的拆出来
     var tagParts = split(tag, classIdSplit);
     var tagName = null;
 
