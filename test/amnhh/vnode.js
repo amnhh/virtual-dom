@@ -3,7 +3,7 @@ var test = require("tape")
 
 
 test('vnode constructor', function (t) {
-    t.plan(3)
+    t.plan(4)
 
     const ospan = h(
         'span#bar',
@@ -49,4 +49,7 @@ test('vnode constructor', function (t) {
     // unhook() 则取消绑定
     t.equal(ospan.hooks.hasOwnProperty('ev-test'), true)
     t.equal('hook' in ospan.hooks['ev-test'], true)
+
+    // 只是将 ev-test 这个 EvStore 实例缓存到了 hooks 里，所以两者应该相等
+    t.equal(ospan.hooks['ev-test'], ospan.properties['ev-test'])
 })
