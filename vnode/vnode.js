@@ -64,7 +64,10 @@ function VirtualNode(tagName, properties, children, key, namespace) {
                 hasThunks = true
             }
 
+            // 如果说 child hooks 属性为真
+            // 代表 child 也具有 hooks => ev-* 属性
             if (!descendantHooks && (child.hooks || child.descendantHooks)) {
+                // 就把这个 flag 置为 true
                 descendantHooks = true
             }
             // 或者 child 就是一个 widget

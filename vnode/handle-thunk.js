@@ -6,6 +6,11 @@ var isThunk = require("./is-thunk")
 module.exports = handleThunk
 
 function handleThunk(a, b) {
+    // 在 createElement 中
+    // 这里只是传入 vnode
+    // 而 vnode 的 type 为 VirtualNode
+    // 所以这里的返回值会是 : { a : a, b : undefined }
+    // 什么都不做
     var renderedA = a
     var renderedB = b
 
