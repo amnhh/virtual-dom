@@ -278,6 +278,8 @@ function undefinedKeys(obj) {
 // List diff, naive left to right reordering
 /**
  * 重新排序
+ * 计算出旧的 children 与新 children 在顺序上的变动
+ * 以 patch 的形式，一次一次的计算出来
  * @param aChildren
  * @param bChildren
  * @returns {*}
