@@ -52,6 +52,7 @@ function walk(a, b, patch, index) {
     // 由于我们入参是 tree 和 newTree
     // 都是 h 函数直接返回的 VNode
     // 所以直接跳过 isThunk 还有 b == null 的环节
+    // TODO 其实这里不知道 Thunk 是个啥东西 应该是 patch 相关的东西
     if (isThunk(a) || isThunk(b)) {
         thunks(a, b, patch, index)
     } else if (b == null) {
@@ -151,7 +152,7 @@ function diffChildren(a, b, patch, apply, index) {
         index += 1
 
         if (!leftNode) {
-            // 如果 leftNode 不村子啊
+            // 如果 leftNode 不存在
             // 就全都是新添加 rightNode 了
             if (rightNode) {
                 // Excess nodes in b need to be added
@@ -168,6 +169,9 @@ function diffChildren(a, b, patch, apply, index) {
     }
 
     if (orderedSet.moves) {
+        // 如果说 moves 存在
+        // 则说明新旧需要重新排序
+        // 则以 patch 的形式标注
         // Reorder nodes last
         apply = appendPatch(apply, new VPatch(
             VPatch.ORDER,

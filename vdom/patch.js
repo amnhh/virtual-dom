@@ -6,13 +6,24 @@ var domIndex = require("./dom-index")
 var patchOp = require("./patch-op")
 module.exports = patch
 
+/**
+ * 将修改 patch 到真实 DOM 上的方法
+ *
+ * @param rootNode
+ * @param patches
+ * @param renderOptions
+ * @returns {*}
+ */
 function patch(rootNode, patches, renderOptions) {
     renderOptions = renderOptions || {}
+    // 我们示例上是没有 renderOptions 这个参数传入的
+    // 所以这里会走到下面的 patchRecursive 中
     renderOptions.patch = renderOptions.patch && renderOptions.patch !== patch
         ? renderOptions.patch
         : patchRecursive
     renderOptions.render = renderOptions.render || render
 
+    // 将patchRecursive的返回值直接返回
     return renderOptions.patch(rootNode, patches, renderOptions)
 }
 
