@@ -56,7 +56,6 @@ function walk(a, b, patch, index) {
     if (isThunk(a) || isThunk(b)) {
         thunks(a, b, patch, index)
     } else if (b == null) {
-
         // If a is a widget we will add a remove patch for it
         // Otherwise any child widgets/hooks must be destroyed.
         // This prevents adding two remove patches for a widget.
@@ -107,14 +106,21 @@ function walk(a, b, patch, index) {
                 applyClear = true
             }
         } else {
+            // b 是 vnode 而 a 不是 vnode 的话
+            // 则向 patch 里 append VNODE 类型的 patch
+            // VNODE 类型的 patch，最终反映到真实 dom 上是会直接调用 replaceNode 的
             apply = appendPatch(apply, new VPatch(VPatch.VNODE, a, b))
             applyClear = true
         }
     } else if (isVText(b)) {
+        // 如果说，b 是一个 text 节点而 a 不是一个 text 节点
         if (!isVText(a)) {
+            // 这里只是多于一个 applyClear 的样子...
             apply = appendPatch(apply, new VPatch(VPatch.VTEXT, a, b))
             applyClear = true
         } else if (a.text !== b.text) {
+            // 如果两者都是 VTEXT
+            // 也是需要一次 patch 的
             apply = appendPatch(apply, new VPatch(VPatch.VTEXT, a, b))
         }
     } else if (isWidget(b)) {
@@ -490,7 +496,7 @@ function reorder(aChildren, bChildren) {
                         removes.push(remove(simulate, simulateIndex, simulateItem.key))
                         simulateItem = simulate[simulateIndex]
                         // if the remove didn't put the wanted item in place, we need to insert it
-                        // 如果说 remove 掉这个simulateItem还是不能够让顺序相同
+                        // 如果说 remove 掉这个 simulateItem 还是不能够让顺序相同
                         // 则我们需要 insert
                         if (!simulateItem || simulateItem.key !== wantedItem.key) {
                             inserts.push({key: wantedItem.key, to: k})

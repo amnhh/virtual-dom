@@ -118,13 +118,16 @@ function destroyWidget(domNode, w) {
 }
 
 function reorderChildren(domNode, moves) {
+    // 真实 dom 里面的子节点列表
     var childNodes = domNode.childNodes
+    // 缓存 key => node 的 map
     var keyMap = {}
     var node
     var remove
     var insert
 
     for (var i = 0; i < moves.removes.length; i++) {
+        // 把 removes
         remove = moves.removes[i]
         node = childNodes[remove.from]
         if (remove.key) {
